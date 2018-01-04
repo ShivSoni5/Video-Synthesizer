@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 import pyaudio
 import sys,random,time,argparse
@@ -87,8 +87,8 @@ def draw_game():
 
 		if not q.empty():
 			b = q.get()
-			newCircle = Circle(random.randint(0,screenWidth), random.randint(0,random.chioice(colors),700)
-		circleList.append(newCircle)
+			newCircle = Circle(random.randint(0,screenWidth), random.randint(0,random.chioice(colors),700))
+			circleList.append(newCircle)
 		
 		screen.fill(black)
 		for place,circle in enumerate(circleList):
@@ -100,3 +100,28 @@ def draw_game():
 		
 		pygame.display.flip()
 		clock.tick(90)
+
+def get_onsets():
+	while True:
+		try:
+			buffer_size = 2048
+			audiobuffer = stream.read(buffer_size, exception_on_overflow = False)
+			signal = np.fromstring(audiobuffer, dtype = np.float32)
+
+			if onset(signal):
+				q.put(True)
+
+		except KeyboardInterrupt:
+			print("trl+c pressed, exiting")
+			break
+
+
+t = Thread(target = get_onsets, args=())
+t.daemon = True
+t.start()
+
+draw_pygame()
+stream.stop_stream()
+stream.close()
+pygame.display.quit()
+
